@@ -1,0 +1,36 @@
+name: 'dynalist-backup'
+description: 'Automatically backup the contents of your Dynalist to a GitHub repository'
+
+inputs:
+  dynalist_session_cookie:
+    description: 'Your personal Dynalist session cookie required to retrieve the backup'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v2
+
+    - id: dynalist_backup
+      shell: bash
+      run: |
+        backup_file_path=./dynalist_backup_$(date +%F_%T).zip
+        content_type=$(curl \
+          -b "PLAY_SESSION=${{ inputs.dynalist_session_cookie }}" \
+          -s -S \
+          https://dynalist.io/backup \
+          -o $backup_file_path \
+          -w '%{content_type}\n' \
+        )
+
+        if ! $(echo "$content_type" | grep -q ^application/zip$); then
+          echo "Expected response to be of Content-Type \"application/zip\". Ensure you have set your \$DYNALIST_SESSION_COOKIE as a secret and that it has not expired."
+          exit 1
+        fi
+
+        echo "::set-output name=backup_file_path::$backup_file_path"
+
+    - uses: EndBug/add-and-commit@v7
+      with:
+        add: ${{ steps.dynalist_backup.outputs.backup_file_path }}
+        message: 'Add current Dynalist backup'
