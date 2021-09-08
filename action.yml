@@ -1,5 +1,6 @@
 name: 'dynalist-backup'
 description: 'Automatically backup the contents of your Dynalist to a GitHub repository'
+color: 'blue'
 
 inputs:
   dynalist_session_cookie:
