@@ -26,7 +26,7 @@ jobs:
   dynalist_backup:
     runs-on: ubuntu-latest
     steps:
-      - uses: jakob-ed/dynalist-backup@v1.0.0
+      - uses: jakob-ed/dynalist-backup@v1.1.0
         with:
           dynalist_session_cookie: ${{ secrets.DYNALIST_SESSION_COOKIE }}
 ```
